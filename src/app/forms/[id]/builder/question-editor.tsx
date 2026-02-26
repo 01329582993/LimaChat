@@ -131,7 +131,7 @@ export function QuestionEditor({ formId, initialQuestions }: { formId: string, i
     };
 
     const isChoiceType = (type: QuestionType) =>
-        [QuestionType.MULTIPLE_CHOICE, QuestionType.CHECKBOX, QuestionType.DROPDOWN].includes(type);
+        ([QuestionType.MULTIPLE_CHOICE, QuestionType.CHECKBOX, QuestionType.DROPDOWN] as QuestionType[]).includes(type);
 
     return (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
