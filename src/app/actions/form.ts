@@ -54,7 +54,7 @@ export async function addQuestion(formId: string, type: any, prompt: string, ord
             type,
             prompt,
             order,
-            options: options || null,
+            options: options || undefined,
         },
     });
 
@@ -174,7 +174,7 @@ export async function createFormWithQuestions(data: { title: string, description
                         prompt: q.prompt,
                         required: q.required ?? true,
                         order: index,
-                        options: q.options || null,
+                        options: q.options || undefined,
                     },
                 })
             )
