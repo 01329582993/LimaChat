@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum FormStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum QuestionType {
+  SHORT_TEXT
+  LONG_TEXT
+  MULTIPLE_CHOICE
+  CHECKBOX
+  DROPDOWN
+  RATING
+}
+
+model Form {
+  id               String           @id @default(cuid())
+  ownerId          String           // Clerk userId
+  title            String
+  description      String?
+  thankYouMessage  String?          @default("Thank you for your response!")
+  status           FormStatus       @default(DRAFT)
+  shareSlug        String           @unique
+  settings         Json?            // Themes, custom colors
+  questions        Question[]
+  responseSessions ResponseSession[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  form        Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formId      String
+  type        QuestionType
+  prompt      String
+  required    Boolean      @default(false)
+  order       Int
+  options     Json?        // For MC, Checkbox, Dropdown choices
+  answers     Answer[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ResponseSession {
+  id             String    @id @default(cuid())
+  form           Form      @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formId         String
+  startedAt      DateTime  @default(now())
+  submittedAt    DateTime?
+  respondentMeta Json?     // Browser info, locale etc.
+  answers        Answer[]
+}
+
+model Answer {
+  id         String          @id @default(cuid())
+  session    ResponseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId  String
+  question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  value      Json            // The respondent's answer
+  createdAt  DateTime        @default(now())
+}
