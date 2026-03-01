@@ -104,3 +104,80 @@ export async function generateFormFromPrompt(userPrompt: string) {
         return null;
     }
 }
+
+export async function analyzeResponses(formTitle: string, questions: any[], responses: any[], chatHistory: { role: "user" | "model", content: string }[], userMessage: string) {
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+
+    if (!apiKey) {
+        console.error("AI Error: GOOGLE_GENERATIVE_AI_API_KEY is missing in ENV");
+        return null;
+    }
+
+    try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: "gemini-flash-latest",
+            generationConfig: {
+                responseMimeType: "application/json",
+            }
+        });
+
+        const prompt = `
+            You are a top-tier data strategist for a form titled "${formTitle}".
+            
+            FORM STRUCTURE (Questions):
+            ${JSON.stringify(questions, null, 2)}
+            
+            RESPONSES DATA:
+            ${JSON.stringify(responses, null, 2)}
+            
+            CONTEXT:
+            Your job is to provide short, direct, and MOTIVATING insights.
+            
+            RETURN FORMAT (JSON):
+            {
+                "message": "Your response here. Keep it SHORT and DIRECT. Do NOT use markdown symbols like *, #, -, or bolding. Use plain text only. Be punchy and professional.",
+                "stats": [ 
+                    {
+                        "type": "METRIC" | "PROGRESS_CHART", 
+                        "label": "Metric or Chart Label",
+                        "value": "Number/String for METRIC (e.g. '85%', '24 Submissions')",
+                        "percentage": number (0-100) for PROGRESS_CHART,
+                        "description": "Short, clear explanation (plain text only)."
+                    }
+                ]
+            }
+            
+            GUIDELINES:
+            - NO MARKDOWN SYMBOLS: Never use #, *, -, or markdown lists.
+            - SHORT & DIRECT: Get straight to the point. No fluff.
+            - PROACTIVE: Call out key trends immediately.
+            - CLEAN: Use simple, plain sentences that are easy to scan.
+            - TONE: Professional, expert, and encouraging.
+            
+            USER MESSAGE: "${userMessage}"
+            CHAT HISTORY: ${JSON.stringify(chatHistory)}
+            
+            IMPORTANT: Return ONLY the JSON object.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text();
+
+        if (text.includes("```")) {
+            text = text.replace(/```json|```/g, "").trim();
+        }
+
+        try {
+            return JSON.parse(text);
+        } catch (parseError) {
+            console.error("AI JSON Parse Error:", parseError);
+            return { message: "I'm having trouble analyzing that right now. Could you try rephrasing?" };
+        }
+    } catch (error) {
+        console.error("Gemini Analysis Error:", error);
+        return { message: "Sorry, I encountered an error while analyzing the responses." };
+    }
+}
+

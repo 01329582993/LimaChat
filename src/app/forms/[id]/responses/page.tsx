@@ -6,6 +6,7 @@ import { ResponsesTable } from "./responses-table";
 import { ExportButton } from "./export-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { AiResponseAssistant } from "./ai-assistant";
 
 export default async function ResponsesPage({ params }: { params: { id: string } }) {
     const { userId } = await auth();
@@ -56,6 +57,7 @@ export default async function ResponsesPage({ params }: { params: { id: string }
 
                 <ResponsesTable form={form} />
             </main>
+            <AiResponseAssistant form={form} />
         </div>
     );
 }
