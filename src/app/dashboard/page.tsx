@@ -16,7 +16,7 @@ export default async function DashboardPage() {
         redirect("/sign-in");
     }
 
-    let forms = [];
+    let forms: any[] = [];
     try {
         forms = await prisma.form.findMany({
             where: { ownerId: userId },
