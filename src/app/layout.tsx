@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -26,6 +27,7 @@ export default function RootLayout({
         <body className={`${manrope.variable} font-sans antialiased`}>
           {children}
           <Toaster />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
