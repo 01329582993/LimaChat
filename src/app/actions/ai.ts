@@ -12,7 +12,7 @@ export async function getAiReaction(formTitle: string, formDescription: string, 
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
         const prompt = `
             You are a friendly and helpful chat host for a form titled "${formTitle}".
@@ -53,7 +53,7 @@ export async function generateFormFromPrompt(userPrompt: string) {
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
+            model: "gemini-1.5-flash-latest",
             generationConfig: {
                 responseMimeType: "application/json",
             }
@@ -118,7 +118,7 @@ export async function analyzeResponses(formTitle: string, questions: any[], resp
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
+            model: "gemini-1.5-flash-latest",
             generationConfig: {
                 responseMimeType: "application/json",
             }
