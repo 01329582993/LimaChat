@@ -7,14 +7,20 @@ export default async function publicFormPage({ params }: { params: { slug: strin
     const { slug } = await params;
     const { userId } = await auth();
 
-    const form = await prisma.form.findUnique({
-        where: { shareSlug: slug },
-        include: {
-            questions: {
-                orderBy: { order: "asc" },
+    let form;
+    try {
+        form = await prisma.form.findUnique({
+            where: { shareSlug: slug },
+            include: {
+                questions: {
+                    orderBy: { order: "asc" },
+                },
             },
-        },
-    });
+        });
+    } catch (error) {
+        console.error("Database error in publicFormPage:", error);
+        notFound();
+    }
 
     if (!form) {
         notFound();

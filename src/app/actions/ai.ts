@@ -12,7 +12,7 @@ export async function getAiReaction(formTitle: string, formDescription: string, 
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
             You are a friendly and helpful chat host for a form titled "${formTitle}".
@@ -33,9 +33,11 @@ export async function getAiReaction(formTitle: string, formDescription: string, 
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        return response.text().trim();
+        const text = response.text().trim();
+        console.log("AI Reaction generated:", text);
+        return text;
     } catch (error) {
-        console.error("Gemini AI Error:", error);
+        console.error("Gemini AI Error (getAiReaction):", error);
         return null;
     }
 }
@@ -51,7 +53,7 @@ export async function generateFormFromPrompt(userPrompt: string) {
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: "gemini-flash-latest",
+            model: "gemini-1.5-flash",
             generationConfig: {
                 responseMimeType: "application/json",
             }
@@ -100,7 +102,7 @@ export async function generateFormFromPrompt(userPrompt: string) {
             throw new Error("Failed to parse AI response");
         }
     } catch (error) {
-        console.error("Gemini Generation Error:", error);
+        console.error("Gemini Generation Error (generateFormFromPrompt):", error);
         return null;
     }
 }
@@ -116,7 +118,7 @@ export async function analyzeResponses(formTitle: string, questions: any[], resp
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: "gemini-flash-latest",
+            model: "gemini-1.5-flash",
             generationConfig: {
                 responseMimeType: "application/json",
             }
@@ -176,7 +178,7 @@ export async function analyzeResponses(formTitle: string, questions: any[], resp
             return { message: "I'm having trouble analyzing that right now. Could you try rephrasing?" };
         }
     } catch (error) {
-        console.error("Gemini Analysis Error:", error);
+        console.error("Gemini Analysis Error (analyzeResponses):", error);
         return { message: "Sorry, I encountered an error while analyzing the responses." };
     }
 }
